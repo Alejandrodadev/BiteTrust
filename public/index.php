@@ -1,3 +1,16 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <title>PHP Test</title>
+    </head>
+    <body>
+    <?php echo '<p>First modification</p>'; ?>
+    </body>
+
+    </html>
+
+
+
 <?php
 
 use Illuminate\Foundation\Application;
