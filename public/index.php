@@ -4,7 +4,7 @@
         <title>PHP Test</title>
     </head>
     <body>
-    <?php echo '<p>First modification</p>'; ?>
+    <?php echo '<p>Second modification</p>'; ?>
     </body>
 
     </html>
