@@ -1,16 +1,3 @@
-<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <title>PHP Test</title>
-    </head>
-    <body>
-    <?php echo '<p>S modification</p>'; ?>
-    </body>
-
-    </html>
-
-
-
 <?php
 
 use Illuminate\Foundation\Application;
