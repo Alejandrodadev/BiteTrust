@@ -13,10 +13,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('restaurant_id')->constrained()->onDelete('cascade');
             $table->enum('rating', [1, 2, 3, 4, 5]);
-            $table->enum('vote', ['useful', 'not_useful']);
             $table->text('comment')->nullable();
             $table->timestamps();
-
             $table->unique(['user_id', 'restaurant_id']);
         });
     }

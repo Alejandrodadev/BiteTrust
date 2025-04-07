@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
 
 class LandingController extends Controller
 {
-    public function index() {
-        return view('landing');
+    public function index()
+    {
+        $restaurants = Restaurant::withCount('reviews')
+            ->withAvg('reviews', 'rating')
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('landing', compact('restaurants'));
     }
 }

@@ -15,9 +15,10 @@ return new class extends Migration
             $table->string('city', 100);
             $table->string('country', 100);
             $table->string('google_place_id')->unique();
+            $table->string('website')->nullable();
+            $table->json('schedule')->nullable();
             $table->timestamps();
         });
-
     }
 
     public function down(): void

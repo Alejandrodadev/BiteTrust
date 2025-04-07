@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UsersTableSeeder extends Seeder
 {
@@ -13,19 +12,13 @@ class UsersTableSeeder extends Seeder
     {
         DB::table('users')->insert([
             [
-                'name' => 'Usuario Demo',
-                'email' => 'demo@example.com',
-                'password' => Hash::make('password'),
+                'name' => 'Alex',
+                'email' => 'alex@example.com',
+                'password' =>bcrypt('12345678'),
                 'created_at' => now(),
                 'updated_at' => now(),
-            ],
-            [
-                'name' => 'Usuario Prueba',
-                'email' => 'prueba@example.com',
-                'password' => Hash::make('password'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            ]
         ]);
+        User::factory(10)->create();
     }
 }
