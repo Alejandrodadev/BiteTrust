@@ -12,7 +12,7 @@ class LandingController extends Controller
         $restaurants = Restaurant::withCount('reviews')
             ->withAvg('reviews', 'rating')
             ->latest()
-            ->take(10)
+            ->take(9)
             ->get();
 
         return view('landing', compact('restaurants'));
