@@ -1,3 +1,4 @@
+{{-- resources/views/landing.blade.php --}}
 <x-app-layout>
     <!-- Hero -->
     <section class="bg-gray-800 text-white py-20">
@@ -15,25 +16,50 @@
         </div>
     </section>
 
-    <!-- Filtros -->
-    <section class="max-w-7xl mx-auto px-4 pt-8">
-        <form method="GET" action="{{ route('landing') }}" class="flex flex-wrap gap-4 items-end">
+    <!-- Filtros colapsables -->
+    <section class="max-w-7xl mx-auto px-4 mt-4" x-data="{ openFilters: false }">
+        <div class="flex justify-end">
+            <button
+                @click="openFilters = !openFilters"
+                class="inline-flex items-center px-3 py-1.5 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="w-4 h-4 mr-1 text-primary"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 019 17v-3.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                <span class="text-sm font-medium text-primary">Filtrar</span>
+                <svg :class="openFilters ? 'rotate-180' : ''"
+                     xmlns="http://www.w3.org/2000/svg"
+                     class="w-4 h-4 ml-1 text-primary transition-transform"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+        </div>
+
+        <div
+            x-show="openFilters"
+            x-cloak
+            x-transition
+            class="mt-2 bg-white border border-gray-200 rounded-md shadow-sm p-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm"
+        >
             {{-- Búsqueda --}}
-            <div class="flex-1 min-w-[200px]">
-                <label class="block text-sm font-medium text-secondary mb-1">Buscar</label>
+            <div>
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
-                       placeholder="Nombre del restaurante..."
-                       class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                       placeholder="Buscar..."
+                       class="w-full px-3 py-1 border border-gray-300 rounded focus:ring-primary focus:border-primary text-sm" />
             </div>
 
             {{-- Ciudad --}}
-            <div class="flex-1 min-w-[150px]">
-                <label class="block text-sm font-medium text-secondary mb-1">Ciudad</label>
+            <div>
                 <select name="city"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
-                    <option value="">Todas</option>
+                        class="w-full px-3 py-1 border border-gray-300 rounded focus:ring-primary focus:border-primary text-sm">
+                    <option value="">Todas las ciudades</option>
                     @foreach($cities as $city)
                         <option value="{{ $city }}" @selected(request('city') === $city)>
                             {{ $city }}
@@ -43,28 +69,28 @@
             </div>
 
             {{-- Orden --}}
-            <div class="flex-1 min-w-[150px]">
-                <label class="block text-sm font-medium text-secondary mb-1">Ordenar por</label>
+            <div>
                 <select name="sort"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                        class="w-full px-3 py-1 border border-gray-300 rounded focus:ring-primary focus:border-primary text-sm">
                     <option value="popularidad" @selected($sort==='popularidad')>Más populares</option>
                     <option value="recientes"   @selected($sort==='recientes')>Recientes</option>
                     <option value="tendencias"  @selected($sort==='tendencias')>Tendencias</option>
                 </select>
             </div>
 
-            <div>
+            {{-- Botón aplicar (ocupa toda la fila en md+) --}}
+            <div class="md:col-span-3 text-right">
                 <button type="submit"
-                        class="px-6 py-2 bg-primary text-form rounded-md shadow hover:bg-primary/90 transition">
-                    Filtrar
+                        class="px-4 py-1 bg-primary text-white rounded text-sm hover:bg-primary/90 transition">
+                    Aplicar
                 </button>
             </div>
-        </form>
+        </div>
     </section>
 
-    <!-- Listado -->
+    <!-- Listado de Restaurantes -->
     <section id="restaurants" class="max-w-7xl mx-auto px-4 py-16">
-        @if(request(['search','city']) && $restaurants->isEmpty())
+        @if((request('search') || request('city')) && $restaurants->isEmpty())
             <p class="text-secondary mb-8">
                 No se encontraron restaurantes que coincidan con esos filtros.
             </p>
@@ -75,15 +101,19 @@
                 <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
                     <div class="p-5 flex justify-between items-start gap-4">
                         <div class="flex-1">
-                            <h4 class="text-lg font-semibold text-primary mb-1">{{ $restaurant->name }}</h4>
+                            <h4 class="text-lg font-semibold text-primary mb-1">
+                                {{ $restaurant->name }}
+                            </h4>
                             <p class="text-sm text-secondary">
-                                {{ number_format($restaurant->reviews_avg_rating,1) }}/5 ⭐ ({{ $restaurant->reviews_count }} reseñas)
+                                {{ number_format($restaurant->reviews_avg_rating,1) }}/5 ⭐
+                                ({{ $restaurant->reviews_count }} reseñas)
                             </p>
                             <a href="{{ route('restaurants.show', $restaurant) }}"
                                class="text-primary hover:underline text-sm inline-block mt-2">
                                 Ver reseñas
                             </a>
                         </div>
+
                         @if($restaurant->photos->count())
                             <div class="flex flex-wrap gap-1">
                                 @foreach($restaurant->photos->take(2) as $photo)

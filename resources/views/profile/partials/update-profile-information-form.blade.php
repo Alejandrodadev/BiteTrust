@@ -3,8 +3,7 @@
         photoPreview: null,
         hasAvatar: {{ $user->avatar ? 'true' : 'false' }},
         defaultAvatar: '{{ asset("images/default-avatar.png") }}'
-    }"
->
+    }">
     <form
         method="POST"
         action="{{ route('profile.update') }}"
