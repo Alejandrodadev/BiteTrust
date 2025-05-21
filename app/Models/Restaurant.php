@@ -22,7 +22,23 @@ class Restaurant extends Model {
 
     public function reviews()
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(\App\Models\Review::class);
     }
+
+    public function photos()
+    {
+        return $this->hasManyThrough(
+            \App\Models\ReviewPhoto::class,
+            \App\Models\Review::class,
+            'restaurant_id',
+            'review_id',
+            'id',
+            'id'
+        );
+    }
+
+
+
+
 
 }

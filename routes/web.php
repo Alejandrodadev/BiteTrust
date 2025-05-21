@@ -1,22 +1,49 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReviewPhotoController;
+use App\Http\Controllers\ProfileController;
 
-
+/*
+|--------------------------------------------------------------------------
+| Rutas públicas
+|--------------------------------------------------------------------------
+*/
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show'])->name('restaurants.show');
-Route::get('/access', function () {return view('auth.login-register');})->name('access');
+Route::get('/access', fn() => view('auth.login-register'))->name('access');
 
-
-Route::get('/dashboard', function () {return view('dashboard');})->middleware(['auth', 'verified'])->name('dashboard');
-
+/*
+|--------------------------------------------------------------------------
+| Rutas protegidas por auth
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', fn() => view('dashboard'))->middleware('verified')->name('dashboard');
+
+    // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rutas de reseñas y fotos de reseñas
+    |--------------------------------------------------------------------------
+    */
+    // Borrar foto individual
+    Route::delete('/reviews/{review}/photos/{photo}', [ReviewPhotoController::class, 'destroy'])->name('photos.destroy');
+
+    // CRUD de reseñas
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/my-reviews', [ReviewController::class, 'userReviews'])->name('reviews.user');
+    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
 require __DIR__.'/auth.php';

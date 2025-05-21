@@ -1,24 +1,21 @@
-<!Doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Show Review</title>
+<x-app-layout>
+    <div class="max-w-4xl mx-auto px-4 py-10">
+        <h1 class="text-3xl font-bold text-text_primary mb-4">{{ $restaurant->name }}</h1>
+        <p class="text-gray-600 mb-8">{{ $restaurant->address }} - {{ $restaurant->city }}, {{ $restaurant->country }}</p>
 
-</head>
-    <body>
-        <p>{{ $review->comment }}</p>
-        <p>Calificación: {{ $review->rating }} ⭐</p>
-        <p>{{ $review->created_at }}</p>
-        <a href="{{ route('reviews.index') }}">Back to Reviews</a>
-        <a href="{{ route('reviews.edit', $review->id) }}">Edit Review</a>
-        <form action="{{ route('reviews.destroy', $review->id) }}" method="POST">
-            @csrf
-            @method('DELETE')
-            <button type="submit">Delete Review</button>
-        </form>
+        <h2 class="text-xl font-semibold mb-4">Reseñas:</h2>
 
-    </body>
-</html>
+        @forelse ($reviews as $review)
+            <div class="mb-6 p-4 bg-white shadow rounded">
+                <div class="flex justify-between mb-2">
+                    <span class="text-text_primary font-semibold">{{ $review->user->name ?? 'Anónimo' }}</span>
+                    <span class="text-yellow-500">{{ $review->rating }} ⭐</span>
+                </div>
+                <p class="text-gray-700">{{ $review->comment }}</p>
+                <p class="text-sm text-gray-400 mt-2">{{ $review->created_at->format('d/m/Y H:i') }}</p>
+            </div>
+        @empty
+            <p class="text-gray-500">Aún no hay reseñas para este restaurante.</p>
+        @endforelse
+    </div>
+</x-app-layout>

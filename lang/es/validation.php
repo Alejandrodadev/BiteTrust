@@ -133,9 +133,80 @@ return [
     */
 
     'attributes' => [
-        'email'    => 'correo electrónico',
-        'password' => 'contraseña',
-        'name'     => 'nombre',
+        // Datos de usuario
+        'name'                            => 'nombre',
+        'username'                        => 'nombre de usuario',
+        'email'                           => 'correo electrónico',
+        'password'                        => 'contraseña',
+        'password_confirmation'           => 'confirmación de contraseña',
+        'current_password'                => 'contraseña actual',
+        'new_password'                    => 'nueva contraseña',
+        'new_password_confirmation'       => 'confirmación de la nueva contraseña',
+        'remember'                        => 'recordarme',
+
+        // Perfil
+        'first_name'                      => 'nombre',
+        'last_name'                       => 'apellido',
+        'avatar'                          => 'foto de perfil',
+        'bio'                             => 'biografía',
+
+        // Contacto
+        'phone'                           => 'teléfono',
+        'address'                         => 'dirección',
+        'city'                            => 'ciudad',
+        'state'                           => 'provincia/estado',
+        'zip'                             => 'código postal',
+        'country'                         => 'país',
+        'website'                         => 'sitio web',
+
+        // Búsquedas y filtros
+        'search'                          => 'búsqueda',
+        'category'                        => 'categoría',
+        'tags'                            => 'etiquetas',
+
+        // Publicaciones, productos, etc.
+        'title'                           => 'título',
+        'subtitle'                        => 'subtítulo',
+        'content'                         => 'contenido',
+        'description'                     => 'descripción',
+        'summary'                         => 'resumen',
+        'price'                           => 'precio',
+        'quantity'                        => 'cantidad',
+        'sku'                             => 'referencia',
+
+        // Fechas y horarios
+        'date'                            => 'fecha',
+        'start_date'                      => 'fecha de inicio',
+        'end_date'                        => 'fecha de fin',
+        'time'                            => 'hora',
+        'start_time'                      => 'hora de inicio',
+        'end_time'                        => 'hora de fin',
+
+        // Archivos e imágenes
+        'image'                           => 'imagen',
+        'images'                          => 'imágenes',
+        'photos'                          => 'fotos',
+        'photos.*'                        => 'foto',
+        'thumbnail'                       => 'miniatura',
+        'file'                            => 'archivo',
+        'files'                           => 'archivos',
+
+        // Reseñas
+        'rating'                          => 'calificación',
+        'comment'                         => 'comentario',
+        'review'                          => 'reseña',
+
+        // Otros
+        'terms'                           => 'términos y condiciones',
+        'agree'                           => 'aceptación',
+        'token'                           => 'token',
     ],
+
+    /*
+        |--------------------------------------------------------------------------
+        | Traducción de reglas nuevas
+        |--------------------------------------------------------------------------
+        */
+    'lowercase' => 'El campo :attribute debe estar en minúsculas.',
 
 ];
