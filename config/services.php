@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'google_places' => [
+        'key' => env('GOOGLE_PLACES_KEY'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

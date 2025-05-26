@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GooglePlacesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\RestaurantController;
@@ -21,9 +22,15 @@ Route::get('/access', fn() => view('auth.login-register'))->name('access');
 | Rutas protegidas por auth
 |--------------------------------------------------------------------------
 */
+
 Route::middleware('auth')->group(function () {
+
     // Dashboard
     Route::get('/dashboard', fn() => view('dashboard'))->middleware('verified')->name('dashboard');
+
+    // Google Places
+    Route::get('/places/test', [GooglePlacesController::class, 'testSearch']);
+    Route::post('/restaurants/register', [GooglePlacesController::class, 'register'])->name('restaurants.register');
 
     // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -35,6 +42,7 @@ Route::middleware('auth')->group(function () {
     | Rutas de reseñas y fotos de reseñas
     |--------------------------------------------------------------------------
     */
+
     // Borrar foto individual
     Route::delete('/reviews/{review}/photos/{photo}', [ReviewPhotoController::class, 'destroy'])->name('photos.destroy');
 

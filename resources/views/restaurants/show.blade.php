@@ -1,32 +1,112 @@
-{{-- resources/views/restaurants/show.blade.php --}}
-@php
-    use Illuminate\Support\Str;
-@endphp
-
 <x-app-layout>
-    <div class="max-w-4xl mx-auto px-4 py-10 text-primary">
-        {{-- Nombre y dirección del restaurante --}}
-        <h1 class="text-3xl font-bold mb-2">{{ $restaurant->name }}</h1>
-        <p class="text-secondary mb-8">
-            {{ $restaurant->address }} — {{ $restaurant->city }}, {{ $restaurant->country }}</p>
+    {{-- Envolvemos header + galería en un solo x-data --}}
+    <div x-data="{ showPhotos: false }" class="mt-8 max-w-4xl mx-auto px-4">
 
-        {{-- Mensajes flash --}}
-        @if(session('success'))
-            <div class="mb-6 p-4 rounded bg-success/10 text-success border border-success/40">
-                {{ session('success') }}
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="mb-6 p-4 rounded bg-error/10 text-error border border-error/40">
-                {{ session('error') }}
-            </div>
-        @endif
+        {{-- Card de info del restaurante --}}
+        <section class="max-w-md ml-0 mb-2">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="p-6 flex flex-col md:flex-row md:items-start md:gap-6">
 
-        {{-- Reseñas paginadas --}}
+                    {{-- Información principal --}}
+                    <div class="flex-1">
+                        <h1 class="text-2xl font-bold text-primary mb-2">
+                            {{ $restaurant->name }}
+                        </h1>
+
+                        {{-- Badges de tipo --}}
+                        @if($restaurant->types)
+                            @php
+                                $foodTypes = ['restaurant','food','bakery','meal_takeaway','meal_delivery','bar','cafe'];
+                            @endphp
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                @foreach($restaurant->types as $type)
+                                    @if(in_array($type, $foodTypes))
+                                        <span class="px-2 py-0.5 bg-gray-100 text-xs text-secondary rounded-full capitalize">{{ str_replace('_',' ',$type) }}
+                                        </span>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
+
+                        {{-- Ratings --}}
+                        <div class="flex items-center gap-4 text-sm mb-4">
+                            <div class="flex items-center gap-1 text-secondary">
+                                <img src="{{ asset('img/logo2.png') }}" alt="BT" class="w-5 h-5">
+                                <span>{{ number_format($restaurant->reviews_avg_rating,1) }}/5</span>
+                                <span class="text-yellow-500">⭐</span>
+                                <span>({{ $restaurant->reviews_count }} reseñas)</span>
+                            </div>
+                            @if($restaurant->ratingGoogle)
+                                <div class="flex items-center gap-1 text-secondary">
+                                    <img src="{{ asset('img/logo-google.png') }}" alt="G" class="w-5 h-5">
+                                    <span>{{ number_format($restaurant->ratingGoogle,1) }}/5</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        {{-- Sección galería + modal ampliado --}}
+        <section class="max-w-4xl mx-auto px-4 mt-4 mb-2"
+            x-data='{ showPhotos: false, showModal: false, photos: @json($placePhotos), modalIndex: 0}'>
+            @if(!empty($placePhotos))
+
+                {{-- Botón Ver fotos --}}
+                <button @click="showPhotos = !showPhotos"
+                    class="inline-flex items-center gap-1 text-primary text-sm hover:underline mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M3 5h18M3 19h18M4 7h16M4 17h16"/>
+                    </svg>
+                    <span x-text="showPhotos ? 'Ocultar' : 'Ver fotos'"></span>
+                </button>
+
+                {{-- Galería en pequeño --}}
+                <template x-if="showPhotos">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                        <template x-for="(url, i) in photos" :key="i">
+                            <img :src="url" class="w-full h-24 object-cover rounded-md shadow-sm cursor-pointer" @click="modalIndex = i; showModal = true"/>
+                        </template>
+                    </div>
+                </template>
+
+                {{-- Lightbox --}}
+                <div x-show="showModal"
+                    x-cloak
+                    x-transition.opacity
+                    @keydown.window.arrow-left.prevent="modalIndex = (modalIndex - 1 + photos.length) % photos.length"
+                    @keydown.window.arrow-right.prevent="modalIndex = (modalIndex + 1) % photos.length"
+                    @click.self="showModal = false"
+                    class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                    <div class="relative">
+                        {{-- Cerrar --}}
+                        <button @click="showModal = false"
+                                class="absolute top-2 right-2 text-white text-3xl">&times;</button>
+
+                        {{-- Anterior --}}
+                        <button @click="modalIndex = (modalIndex - 1 + photos.length) % photos.length"
+                                class="absolute left-2 top-1/2 transform -translate-y-1/2 text-white text-3xl p-2">&lsaquo;</button>
+
+                        {{-- Imagen ampliada --}}
+                        <img :src="photos[modalIndex]" class="max-w-full max-h-[80vh] rounded-md shadow-lg"/>
+
+                        {{-- Siguiente --}}
+                        <button @click="modalIndex = (modalIndex + 1) % photos.length"
+                                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-white text-3xl p-2">&rsaquo;</button>
+                    </div>
+                </div>
+            @endif
+        </section>
+
+        {{-- Reseñas propias --}}
         @foreach($reviews as $review)
             <div class="bg-white rounded-xl shadow p-4 mb-4">
                 <div class="flex justify-between items-center mb-2">
-                    {{-- Avatar + Nombre --}}
                     <div class="flex items-center space-x-2">
                         @if ($review->user->avatar)
                             <img src="{{ asset('storage/'.$review->user->avatar) }}"
@@ -36,13 +116,15 @@
                                 <x-heroicon-o-user-circle class="w-5 h-5 text-gray-400" />
                             </div>
                         @endif
-                        <h4 class="text-primary font-semibold text-sm">{{ $review->user->name }}</h4>
+                        <span class="text-sm font-semibold text-primary">
+                    {{ $review->user->name }}
+                </span>
                     </div>
-                    {{-- Puntuación --}}
-                    <span class="text-yellow-500 font-bold text-sm">{{ $review->rating }} ⭐</span>
+                    <span class="text-yellow-500 font-bold text-sm">
+                {{ $review->rating }} ⭐
+            </span>
                 </div>
 
-                {{-- Comentario con “Ver más” --}}
                 <div x-data="{ open: false }" class="text-secondary text-sm mb-2">
                     <template x-if="!open">
                         <p>{{ Str::limit($review->comment, 250) }}
@@ -54,7 +136,8 @@
                         </p>
                     </template>
                     <template x-if="open">
-                        <p>{{ $review->comment }}
+                        <p>
+                            {{ $review->comment }}
                             <button @click="open = false" class="text-primary text-xs hover:underline">
                                 Ver menos
                             </button>
@@ -62,24 +145,78 @@
                     </template>
                 </div>
 
-                {{-- Fecha --}}
-                <p class="text-xs text-secondary mb-2"> {{ $review->created_at->format('d/m/Y H:i') }}</p>
+                <p class="text-xs text-secondary mb-2">{{ $review->created_at->format('d/m/Y H:i') }}</p>
 
-                {{-- Fotos con JavaScript puro --}}
                 @if($review->photos->count())
-                    {{-- Contenedor de miniaturas --}}
                     <div class="flex flex-wrap gap-2 mb-2 review-photos"
-                        data-photos='@json($review->photos->map(fn($p) => asset($p->photo_url)))'>
+                         data-photos='@json($review->photos->map(fn($p) => asset($p->photo_url)))'>
                         @foreach($review->photos as $photo)
                             <img src="{{ asset($photo->thumbnail_url) }}"
-                                data-index="{{ $loop->index }}"
-                                class="w-16 h-16 object-cover rounded border shadow-sm cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-110"
-                                alt="Miniatura {{ $loop->index + 1 }}"/>
+                                 data-index="{{ $loop->index }}"
+                                 class="w-16 h-16 object-cover rounded border shadow-sm cursor-pointer hover:scale-110 transition-transform"
+                                 alt="Miniatura {{ $loop->index + 1 }}" />
                         @endforeach
                     </div>
                 @endif
             </div>
         @endforeach
+
+        {{-- Reseñas externas --}}
+        @foreach($externalReviews as $gReview)
+            <div class="bg-white rounded-xl shadow p-4 mb-4" x-data="{ openComment: false }">
+                <div class="flex justify-between items-center mb-2">
+
+                    {{-- Avatar + Nombre --}}
+                    <div class="flex items-center space-x-2">
+                        @if($gReview->profile_photo_url)
+                            <img src="{{ $gReview->profile_photo_url }}"
+                                 alt="{{ $gReview->author_name }}"
+                                 class="w-8 h-8 rounded-full object-cover" />
+                        @else
+                            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                <x-heroicon-o-user-circle class="w-5 h-5 text-gray-400" />
+                            </div>
+                        @endif
+                        <span class="text-sm font-semibold text-gray-800">
+                    {{ $gReview->author_name }}
+                </span>
+                    </div>
+                    <span class="text-yellow-500 font-bold text-sm">
+                {{ $gReview->rating }} ⭐
+            </span>
+                </div>
+
+                {{-- From Google --}}
+                <div class="flex items-center text-xs text-gray-500 mb-2">
+                    <img src="{{ asset('img/logo-google.png') }}"
+                         alt="Google Logo"
+                         class="w-4 h-4 ml-1" />
+                </div>
+
+                {{-- Comentario resumido / completo --}}
+                <div class="text-secondary text-sm mb-2">
+                    <template x-if="!openComment">
+                        <p>{{ Str::limit($gReview->text, 250) }}</p>
+                    </template>
+                    <template x-if="openComment">
+                        <p>{{ $gReview->text }}</p>
+                    </template>
+                </div>
+
+                {{-- Botón ver más / ver menos comentario --}}
+                @if(strlen($gReview->text) > 250)
+                    <button
+                        @click="openComment = !openComment"
+                        class="text-primary text-xs hover:underline mb-2">
+                        <span x-text="openComment ? 'Ver menos' : 'Ver más'"></span>
+                    </button>
+                @endif
+
+                {{-- Fecha --}}
+                <p class="text-xs text-gray-500">{{ $gReview->relative_time_description }}</p>
+            </div>
+        @endforeach
+
 
         {{-- Paginación --}}
         <div class="mt-6">

@@ -45,7 +45,7 @@ class LandingController extends Controller
         }
 
         // Paginamos 9 por página (manteniendo querystring)
-        $restaurants = $query->paginate(9)->withQueryString();
+        $restaurants = $query->paginate(12)->withQueryString();
 
         return view('landing', compact('restaurants', 'cities', 'sort'));
     }

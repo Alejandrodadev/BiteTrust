@@ -23,6 +23,10 @@
     <meta name="msapplication-TileImage" content="{{ asset('favicons/favicon.ico') }}">
     <meta name="theme-color" content="#ffffff">
 
+    <!-- Google Scripts -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_PLACES_KEY') }}&libraries=places"></script>
+
+
     <!-- Styles & Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
