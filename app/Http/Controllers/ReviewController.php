@@ -18,6 +18,7 @@ class ReviewController extends Controller
     public function index()
     {
         $reviews = Review::with(['user', 'restaurant', 'photos'])->get();
+
         return view('reviews.index', compact('reviews'));
     }
 
@@ -43,8 +44,8 @@ class ReviewController extends Controller
         }
 
         $review = Review::create($request->only([
-                'restaurant_id', 'rating', 'comment'
-            ]) + ['user_id' => Auth::id()]);
+            'restaurant_id', 'rating', 'comment',
+        ]) + ['user_id' => Auth::id()]);
 
         $this->processPhotos($review, $request->file('photos', []));
 
@@ -59,6 +60,7 @@ class ReviewController extends Controller
     public function show(Review $review)
     {
         $review->load(['user', 'photos']);
+
         return view('reviews.show', compact('review'));
     }
 
@@ -81,6 +83,7 @@ class ReviewController extends Controller
     public function edit(Review $review)
     {
         abort_if($review->user_id !== Auth::id(), 403);
+
         return view('reviews.edit', compact('review'));
     }
 
@@ -133,9 +136,9 @@ class ReviewController extends Controller
     protected function processPhotos(Review $review, array $files): void
     {
         foreach ($files as $file) {
-            $uuid      = Str::uuid();
-            $dir       = "restaurants/{$review->id}";
-            $origName  = "{$uuid}.webp";
+            $uuid = Str::uuid();
+            $dir = "restaurants/{$review->id}";
+            $origName = "{$uuid}.webp";
             $thumbName = "{$uuid}_thumb.webp";
 
             $publicDir = storage_path("app/public/{$dir}");
@@ -143,12 +146,12 @@ class ReviewController extends Controller
                 mkdir($publicDir, 0755, true);
             }
 
-            $img       = imagecreatefromstring(file_get_contents($file->getRealPath()));
-            $origPath  = "{$publicDir}/{$origName}";
+            $img = imagecreatefromstring(file_get_contents($file->getRealPath()));
+            $origPath = "{$publicDir}/{$origName}";
             imagewebp($img, $origPath, 90);
 
-            $w     = imagesx($img);
-            $h     = imagesy($img);
+            $w = imagesx($img);
+            $h = imagesy($img);
             $thumb = imagescale($img, 300, intval($h * (300 / $w)));
             $thumbPath = "{$publicDir}/{$thumbName}";
             imagewebp($thumb, $thumbPath, 80);
@@ -157,8 +160,8 @@ class ReviewController extends Controller
             imagedestroy($thumb);
 
             ReviewPhoto::create([
-                'review_id'     => $review->id,
-                'photo_url'     => "storage/{$dir}/{$origName}",
+                'review_id' => $review->id,
+                'photo_url' => "storage/{$dir}/{$origName}",
                 'thumbnail_url' => "storage/{$dir}/{$thumbName}",
             ]);
         }

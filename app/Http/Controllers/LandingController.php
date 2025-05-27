@@ -18,7 +18,7 @@ class LandingController extends Controller
 
         // Filtro por búsqueda de nombre
         if ($request->filled('search')) {
-            $query->where('name', 'LIKE', '%'. $request->search .'%');
+            $query->where('name', 'LIKE', '%'.$request->search.'%');
         }
 
         // Filtro por ciudad
@@ -31,15 +31,13 @@ class LandingController extends Controller
 
         if ($sort === 'recientes') {
             $query->orderByDesc('created_at');
-        }
-        elseif ($sort === 'tendencias') {
-            $query->withCount(['reviews as recent_reviews_count' => function($q) {
+        } elseif ($sort === 'tendencias') {
+            $query->withCount(['reviews as recent_reviews_count' => function ($q) {
                 $q->where('created_at', '>=', now()->subDays(7));
             }])
                 ->orderByDesc('recent_reviews_count')
                 ->orderByDesc('reviews_count');
-        }
-        else {
+        } else {
             $query->orderByDesc('reviews_count')
                 ->orderByDesc('reviews_avg_rating');
         }

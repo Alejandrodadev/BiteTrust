@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Review;
 use App\Models\ReviewPhoto;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ReviewPhotoController extends Controller
@@ -19,7 +18,7 @@ class ReviewPhotoController extends Controller
         abort_if($review->user_id !== auth()->id(), 403);
 
         // Borrar archivos (optimizada + miniatura)
-        $path      = str_replace('storage/', '', $photo->photo_url);
+        $path = str_replace('storage/', '', $photo->photo_url);
         $thumbPath = str_replace('storage/', '', $photo->thumbnail_url);
 
         Storage::disk('public')->delete([$path, $thumbPath]);

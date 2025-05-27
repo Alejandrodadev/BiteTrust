@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\GooglePlacesController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReviewPhotoController;
-use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +15,13 @@ use App\Http\Controllers\ProfileController;
 */
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show'])->name('restaurants.show');
-Route::get('/access', fn() => view('auth.login-register'))->name('access');
+Route::get('/access', fn () => view('auth.login-register'))->name('access');
+
+// Cookies y privacidad
+Route::view('/cookies-policy', 'cookies.policy')->name('cookies.policy');
+
+// Rutas de análisis de restaurantes con OpenAI
+Route::get('/restaurants/{restaurant}/analysis', [RestaurantController::class, 'analysis'])->name('restaurants.analysis');
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +32,7 @@ Route::get('/access', fn() => view('auth.login-register'))->name('access');
 Route::middleware('auth')->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', fn() => view('dashboard'))->middleware('verified')->name('dashboard');
+    Route::get('/dashboard', fn () => view('dashboard'))->middleware('verified')->name('dashboard');
 
     // Google Places
     Route::get('/places/test', [GooglePlacesController::class, 'testSearch']);

@@ -26,29 +26,50 @@
     <!-- Google Scripts -->
     <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_PLACES_KEY') }}&libraries=places"></script>
 
-
     <!-- Styles & Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Alpine.js para x-data, x-show, x-for, etc. -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>[x-cloak] { display: none !important; }</style>
-</head>
-<body class="font-sans antialiased">
-<div class="min-h-screen bg-gray-100">
-    @include('layouts.navigation')
+        </head>
+            <body class="font-sans antialiased">
+                <div class="min-h-screen bg-gray-100">
+                @include('layouts.navigation')
 
-    @isset($header)
-        <header class="bg-white">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                {{ $header }}
-            </div>
-        </header>
-    @endisset
+                @isset($header)
+                <header class="bg-white">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+                @endisset
 
-    <main>
-        {{ $slot }}
-    </main>
-</div>
-</body>
+        <main>
+            {{ $slot }}
+        </main>
+    </div>
+
+    <!-- Aviso de Cookies -->
+    <div x-data="{
+        open: localStorage.getItem('cookies_accepted') !== 'true'}"
+        x-show="open"
+        x-cloak
+        class="fixed bottom-4 right-4 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg p-4 space-y-2 z-50">
+        <p class="text-sm text-gray-700">
+            🍪 Usamos cookies propias y de terceros para mejorar tu experiencia.
+            Si continúas navegando aceptas su uso.</p>
+
+        <div class="flex justify-end space-x-2">
+            <button
+                @click="open = false; localStorage.setItem('cookies_accepted','true')"
+                class="px-3 py-1 text-sm bg-primaryLight text-white rounded hover:bg-primary/90 transition">
+                Aceptar
+            </button>
+            <a href="{{ route('cookies.policy') }}" class="px-3 py-1 text-sm text-gray-600 hover:underline">
+            Más info
+            </a>
+        </div>
+    </div>
+    </body>
 </html>

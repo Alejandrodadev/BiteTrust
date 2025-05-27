@@ -49,6 +49,61 @@
             </div>
         </section>
 
+        {{-- Botón y resultados de análisis IA --}}
+        <div x-data="{ loadingIA: false, ia: null }" class="mt-4 mb-6">
+
+        {{-- Botón --}}
+            <button
+                @click="loadingIA = true; ia = null;
+                fetch('{{ route('restaurants.analysis', $restaurant->id) }}')
+                    .then(r => r.json())
+                    .then(data => ia = data)
+                    .catch(() => alert('Error al analizar reseñas'))
+                    .finally(() => loadingIA = false)"
+                class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                <template x-if="!loadingIA">
+                    <span>🔍 Analizar reseñas (IA)</span>
+                </template>
+                <template x-if="loadingIA">
+                    <span>Cargando análisis...</span>
+                </template>
+            </button>
+
+            {{-- Card unificado de análisis IA --}}
+            <template x-if="ia && (ia.analisis || (ia.platos && ia.platos.length > 0))">
+                <div class="mt-4 p-4 bg-white border rounded shadow space-y-4 text-sm text-gray-800">
+
+                    {{-- Análisis general --}}
+                    <div>
+                        <h3 class="text-base font-semibold text-blue-600 mb-1">Análisis general:</h3>
+                        <p x-text="ia.analisis"></p>
+                    </div>
+
+                    {{-- Platos destacados --}}
+                    <div x-show="ia.platos && ia.platos.length > 0" class="space-y-2">
+                        <template x-for="plato in ia.platos" :key="plato.plato">
+                            <div>
+                                <h4 class="font-semibold text-primary">
+                                    <span x-text="plato.plato"></span>
+                                    <span class="text-xs text-secondary"> ( <span x-text="plato.menciones"></span> menciones )</span>
+                                </h4>
+                                <p class="text-secondary italic" x-text="(plato.frases_destacadas || []).join(' ')"></p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            {{-- Mensaje si no hay nada --}}
+            <p class="text-sm text-gray-500 mt-4" x-show="ia && !ia.analisis && (!ia.platos || ia.platos.length === 0)">
+                No se encontraron resultados destacados en las reseñas.
+            </p>
+        </div>
+
+
+
+
+
         {{-- Sección galería + modal ampliado --}}
         <section class="max-w-4xl mx-auto px-4 mt-4 mb-2"
             x-data='{ showPhotos: false, showModal: false, photos: @json($placePhotos), modalIndex: 0}'>
@@ -225,7 +280,7 @@
 
         {{-- Formulario para dejar nueva reseña --}}
         @auth
-            <div class="mt-10 bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+            <div class="mt-6 mb-3 bg-white dark:bg-gray-800 rounded-xl shadow p-6">
                 <h3 class="text-lg font-semibold mb-4 text-primary">Deja tu reseña</h3>
                 <form action="{{ route('reviews.store') }}"
                       method="POST"
@@ -309,7 +364,7 @@
                 </form>
             </div>
         @else
-            <div class="mt-10 text-center">
+            <div class="mt-6 mb-4 text-center">
                 <p class="text-sm text-primary">
                     ¿Quieres dejar una reseña?
                     <a href="{{ route('access') }}" class="underline hover:opacity-80">Inicia sesión</a>.
@@ -382,4 +437,10 @@
             });
         });
     </script>
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-8">
+        <div class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-secondary">
+            © {{ date('Y') }} {{ config('app.name') }}. Todos los derechos reservados.
+        </div>
+    </footer>
 </x-app-layout>

@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Restaurant;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class RestaurantsTableSeeder extends Seeder
 {

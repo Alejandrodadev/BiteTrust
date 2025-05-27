@@ -8,10 +8,6 @@
             <p class="text-lg mb-6 text-primary">
                 Explora opiniones, calificaciones y fotos de otros comensales. ¿Ya fuiste a uno? ¡Deja tu reseña!
             </p>
-            <a href="#restaurants"
-               class="inline-block border border-gray-300 bg-white text-form px-4 py-2 rounded-md shadow-sm hover:bg-gray-300 transition mb-8">
-                Ver Restaurantes
-            </a>
         </div>
     </section>
 
@@ -51,7 +47,7 @@
                             });
                         }
                     "
-                    class="inline-flex items-center px-3 py-1.5 bg-primary text-white rounded-md shadow-sm hover:bg-primary/90 transition">
+                    class="inline-flex items-center px-3 py-1.5 border border-gray-200 bg-white text-primary rounded-md shadow-sm hover:bg-gray-100 transition">
                 <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 11c0 .66-.03 1.31-.08 1.95M7.05 12a4.95 4.95 0 019.9 0M12 4a8 8 0 018 8m0 0H4"/>
@@ -106,39 +102,43 @@
     </section>
 
     <!-- Formulario registro restaurante + mensajes -->
-    <section class="max-w-7xl mx-auto px-4 mt-4 mb-4">
+    <section class="max-w-7xl mx-auto px-4 mt-2 mb-2">
 
         @if(session('success'))
-            <div class="mb-4 bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded shadow-sm">
+            <div class="mb-4 bg-green-100 border border-green-400 text-secondary px-3 py-2 rounded shadow-sm">
                 {{ session('success') }}
             </div>
         @endif
 
         @if(session('info'))
-            <div class="mb-4 bg-blue-100 border border-blue-400 text-blue-800 px-4 py-3 rounded shadow-sm">
+            <div class="mb-4 bg-blue-100 border border-blue-400 text-secondary px-3 py-2 rounded shadow-sm">
                 {{ session('info') }}
             </div>
         @endif
 
         @if(session('error'))
-            <div class="mb-4 bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded shadow-sm">
+            <div class="mb-4 bg-red-100 border border-red-400 text-secondary px-3 py-2 rounded shadow-sm">
                 {{ session('error') }}
             </div>
         @endif
 
         <form method="POST" action="{{ route('restaurants.register') }}" id="registerPlaceForm">
             @csrf
-            <label class="block text-sm text-secondary font-sans mb-1">Buscar restaurante en Google</label>
-            <input type="text" id="placeInput"
-                   class="w-full border rounded px-4 py-2"
-                   placeholder="Ej: Los 33, Madrid" autocomplete="off">
+            <label class="block text-sm text-secondary font-sans mb-1">¿Qué se te antoja hoy? Busca un restaurante y guardalo</label>
+            <input
+                type="text"
+                id="placeInput"
+                class="w-full px-4 py-2 bg-white text-secondary border border-gray-300 rounded-md shadow-sm placeholder-gray-400
+                focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                placeholder="Ej: Los 33, Madrid"
+                autocomplete="off"/>
 
             <input type="hidden" name="place_id" id="place_id">
 
-            <div class="mt-2">
+            <div class="mt-1">
                 <button type="submit"
-                        class="inline-flex items-center px-3 py-1.5 text-primary bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition">
-                    Registrar restaurante
+                        class="inline-flex items-center px-2 py-1 text-primary bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 transition">
+                    Guardar
                 </button>
             </div>
         </form>
@@ -250,11 +250,10 @@
             {{ $restaurants->links() }}
         </div>
     </section>
-
     <!-- Footer -->
     <footer class="bg-white border-t mt-16">
         <div class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-secondary">
-            &copy; {{ date('Y') }} BiteTrust. Todos los derechos reservados.
+            © {{ date('Y') }} {{ config('app.name') }}. Todos los derechos reservados.
         </div>
     </footer>
 </x-app-layout>

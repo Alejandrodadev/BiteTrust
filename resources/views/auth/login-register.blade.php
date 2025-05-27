@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>LOGIN</title>
-</head>
 
 @php
     use Illuminate\Support\Facades\Route;
@@ -11,6 +5,19 @@
 @endphp
 
 <x-guest-layout>
+
+    @if (session('success'))
+        <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('status'))
+        <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
+            {{ session('status') }}
+        </div>
+    @endif
+
     <div
         x-data="{ isLogin: {{ $startInRegister ? 'false' : 'true' }} }"
         class="max-w-md mx-auto mt-12 bg-white p-6 rounded shadow relative"

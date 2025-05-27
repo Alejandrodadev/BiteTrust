@@ -14,10 +14,10 @@ class UsersTableSeeder extends Seeder
             [
                 'name' => 'Alex',
                 'email' => 'alex@example.com',
-                'password' =>bcrypt('12345678'),
+                'password' => bcrypt('12345678'),
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]
+            ],
         ]);
         User::factory(10)->create();
     }
