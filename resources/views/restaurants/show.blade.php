@@ -1,24 +1,21 @@
 <x-app-layout>
-    {{-- Envolvemos header + galería en un solo x-data --}}
-    <div x-data="{ showPhotos: false }" class="mt-8 max-w-4xl mx-auto px-4">
+    <div x-data="{ showPhotos: false }" class="mt-6 max-w-4xl mx-auto px-4">
 
         {{-- Card de info del restaurante --}}
         <section class="max-w-md ml-0 mb-2">
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-white rounded-md shadow-lg overflow-hidden">
                 <div class="p-6 flex flex-col md:flex-row md:items-start md:gap-6">
 
                     {{-- Información principal --}}
-                    <div class="flex-1">
-                        <h1 class="text-2xl font-bold text-primary mb-2">
-                            {{ $restaurant->name }}
-                        </h1>
+                    <div class="flex-1 text-secondary text-xs">
+                        <h1 class="text-2xl font-bold text-primary mb-2">{{ $restaurant->name }}</h1>
 
-                        {{-- Badges de tipo --}}
+                        {{-- Etiquetas tipo --}}
                         @if($restaurant->types)
                             @php
                                 $foodTypes = ['restaurant','food','bakery','meal_takeaway','meal_delivery','bar','cafe'];
                             @endphp
-                            <div class="flex flex-wrap gap-2 mb-3">
+                            <div class="flex flex-wrap gap-2 mb-2">
                                 @foreach($restaurant->types as $type)
                                     @if(in_array($type, $foodTypes))
                                         <span class="px-2 py-0.5 bg-gray-100 text-xs text-secondary rounded-full capitalize">{{ str_replace('_',' ',$type) }}
@@ -29,8 +26,8 @@
                         @endif
 
                         {{-- Ratings --}}
-                        <div class="flex items-center gap-4 text-sm mb-4">
-                            <div class="flex items-center gap-1 text-secondary">
+                        <div class="flex items-center gap-4 text-sm mb-2">
+                            <div class="flex items-center text-xs text-secondary gap-1">
                                 <img src="{{ asset('img/logo2.png') }}" alt="BT" class="w-5 h-5">
                                 <span>{{ number_format($restaurant->reviews_avg_rating,1) }}/5</span>
                                 <span class="text-yellow-500">⭐</span>
@@ -43,39 +40,72 @@
                                 </div>
                             @endif
                         </div>
-                    </div>
 
+                        {{-- Dirección + Web --}}
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs text-secondary">{{ $restaurant->address }}📍</span>
+                            @if($restaurant->website)
+                                <a href="{{ $restaurant->website }}" target="_blank" rel="noopener noreferrer"
+                                   class="hover:opacity-90 transition" title="Visitar sitio web">
+                                    <img src="{{ asset('img/iconWeb.png') }}" alt="Web" class="w-5 h-5" />
+                                </a>
+                            @endif
+                        </div>
+
+                        {{-- Horario --}}
+                        @if($restaurant->schedule)
+                            <div x-data="{ showSchedule: false }" class="mt-1">
+                                <button @click="showSchedule = !showSchedule"
+                                        class="mt-1 text-xs text-primary hover:underline flex items-center gap-1">
+                                    <span class="inline-flex items-center justify-center w-6 h-6 bg-primary/10 text-primary rounded-full mr-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
+                                        </svg>
+                                    </span>
+                                    <span x-text="showSchedule ? 'Ocultar' : 'Horario'"></span>
+                                </button>
+
+                                <ul x-show="showSchedule" x-transition
+                                    class="mt-1 text-xs text-secondary space-y-0.5" x-cloak>
+                                    @foreach($restaurant->schedule as $line)
+                                        <li>{{ $line }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </section>
 
-        {{-- Botón y resultados de análisis IA --}}
-        <div x-data="{ loadingIA: false, ia: null }" class="mt-4 mb-6">
-
-        {{-- Botón --}}
+        {{-- Botón y resultados del análisis --}}
+        <div x-data="iaAnalysis('{{ route('restaurants.analysis', $restaurant->id) }}', {{ auth()->guest() ? 'true' : 'false' }})" class="mt-2 mb-2 max-w-md ml-0">
             <button
-                @click="loadingIA = true; ia = null;
-                fetch('{{ route('restaurants.analysis', $restaurant->id) }}')
-                    .then(r => r.json())
-                    .then(data => ia = data)
-                    .catch(() => alert('Error al analizar reseñas'))
-                    .finally(() => loadingIA = false)"
-                class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                @click="analizar"
+                class="w-full px-3 py-1.5 border border-gray-300 text-primary text-xs bg-white rounded-md shadow-sm hover:bg-gray-100 transition">
+
                 <template x-if="!loadingIA">
-                    <span>🔍 Analizar reseñas (IA)</span>
+                    <span>🔍 Análisis IA</span>
                 </template>
                 <template x-if="loadingIA">
-                    <span>Cargando análisis...</span>
+                    <span class="italic text-secondary">Leyendo reseñas...</span>
                 </template>
             </button>
 
-            {{-- Card unificado de análisis IA --}}
+            @guest
+                <div x-show="showInfo" x-transition class="mt-2 text-xs text-secondary bg-blue-200 border border-primaryLight rounded p-2">
+                    La IA ya leyó cientos de reseñas por ti y sabe qué vas a pedir…
+                    <a href="{{ route('access') }}" class=" hover:opacity-80 text-primary ">Inicia sesión</a> para descubrirlo 🤖
+                </div>
+            @endguest
+
+            {{-- Card unificado de análisis --}}
             <template x-if="ia && (ia.analisis || (ia.platos && ia.platos.length > 0))">
                 <div class="mt-4 p-4 bg-white border rounded shadow space-y-4 text-sm text-gray-800">
 
                     {{-- Análisis general --}}
                     <div>
-                        <h3 class="text-base font-semibold text-blue-600 mb-1">Análisis general:</h3>
+                        <h3 class="text-base font-semibold text-primary mb-1">Opinion general</h3>
                         <p x-text="ia.analisis"></p>
                     </div>
 
@@ -96,12 +126,9 @@
 
             {{-- Mensaje si no hay nada --}}
             <p class="text-sm text-gray-500 mt-4" x-show="ia && !ia.analisis && (!ia.platos || ia.platos.length === 0)">
-                No se encontraron resultados destacados en las reseñas.
+                No se encontro suficiente informacion.
             </p>
         </div>
-
-
-
 
 
         {{-- Sección galería + modal ampliado --}}
@@ -180,25 +207,21 @@
             </span>
                 </div>
 
-                <div x-data="{ open: false }" class="text-secondary text-sm mb-2">
+                <div x-data="toggleReview(@js($review->comment))" class="text-secondary text-sm mb-2">
                     <template x-if="!open">
-                        <p>{{ Str::limit($review->comment, 250) }}
-                            @if(strlen($review->comment) > 250)
-                                <button @click="open = true" class="text-primary text-xs hover:underline">
-                                    Ver más
-                                </button>
-                            @endif
-                        </p>
+                        <p x-text="short"></p>
                     </template>
                     <template x-if="open">
-                        <p>
-                            {{ $review->comment }}
-                            <button @click="open = false" class="text-primary text-xs hover:underline">
-                                Ver menos
-                            </button>
-                        </p>
+                        <p x-text="full"></p>
+                    </template>
+
+                    <template x-if="hasMore">
+                        <button @click="toggle" class="text-primary text-xs hover:underline mt-1">
+                            <span x-text="open ? 'Ver menos' : 'Ver más'"></span>
+                        </button>
                     </template>
                 </div>
+
 
                 <p class="text-xs text-secondary mb-2">{{ $review->created_at->format('d/m/Y H:i') }}</p>
 
@@ -249,29 +272,25 @@
                 </div>
 
                 {{-- Comentario resumido / completo --}}
-                <div class="text-secondary text-sm mb-2">
-                    <template x-if="!openComment">
-                        <p>{{ Str::limit($gReview->text, 250) }}</p>
+                <div x-data="toggleReview(@js($gReview->text))" class="text-secondary text-sm mb-2">
+                    <template x-if="!open">
+                        <p x-text="short"></p>
                     </template>
-                    <template x-if="openComment">
-                        <p>{{ $gReview->text }}</p>
+                    <template x-if="open">
+                        <p x-text="full"></p>
+                    </template>
+
+                    <template x-if="hasMore">
+                        <button @click="toggle" class="text-primary text-xs hover:underline mt-1">
+                            <span x-text="open ? 'Ver menos' : 'Ver más'"></span>
+                        </button>
                     </template>
                 </div>
-
-                {{-- Botón ver más / ver menos comentario --}}
-                @if(strlen($gReview->text) > 250)
-                    <button
-                        @click="openComment = !openComment"
-                        class="text-primary text-xs hover:underline mb-2">
-                        <span x-text="openComment ? 'Ver menos' : 'Ver más'"></span>
-                    </button>
-                @endif
 
                 {{-- Fecha --}}
                 <p class="text-xs text-gray-500">{{ $gReview->relative_time_description }}</p>
             </div>
         @endforeach
-
 
         {{-- Paginación --}}
         <div class="mt-6">
@@ -280,100 +299,24 @@
 
         {{-- Formulario para dejar nueva reseña --}}
         @auth
-            <div class="mt-6 mb-3 bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                <h3 class="text-lg font-semibold mb-4 text-primary">Deja tu reseña</h3>
-                <form action="{{ route('reviews.store') }}"
-                      method="POST"
-                      enctype="multipart/form-data"
-                      class="space-y-6">
-                    @csrf
-                    <input type="hidden" name="restaurant_id" value="{{ $restaurant->id }}">
+            <div id="review-form" class="mt-6 mb-4">
 
-                    {{-- Calificación --}}
-                    <div x-data="{ open: false, selected: '{{ old('rating') }}', options: [
-                              { value: '', label: 'Selecciona la calificación' },
-                              { value: '5', label: '5 ⭐' },
-                              { value: '4', label: '4 ⭐' },
-                              { value: '3', label: '3 ⭐' },
-                              { value: '2', label: '2 ⭐' },
-                              { value: '1', label: '1 ⭐' }
-                            ] }" class="relative">
-                        <label for="rating" class="block text-sm font-medium text-white mb-1">Calificación</label>
-                        <button
-                            type="button"
-                            @click="open = !open"
-                            @click.away="open = false"
-                            class="w-full text-left px-4 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:!ring-primary focus:!border-primary"><span
-                            x-text="options.find(o => o.value === selected)?.label || 'Selecciona la calificación'"
-                            :class="selected ? 'text-primary' : 'text-secondary'"></span>
-                            <svg class="w-4 h-4 float-right mt-1 text-secondary"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M19 9l-7 7-7-7"/></svg>
-                        </button>
-                        <ul x-show="open" x-transition
-                            class="absolute z-10 mt-1 w-full bg-white border border-primary rounded-md shadow-md max-h-60 overflow-auto">
-                            <template x-for="o in options" :key="o.value">
-                                <li @click="selected = o.value; open = false"
-                                    :class="{ 'bg-gray-100': selected === o.value }"
-                                    class="px-4 py-2 text-form hover:bg-primaryLight cursor-pointer">
-                                    <span x-text="o.label"></span>
-                                </li>
-                            </template>
-                        </ul>
-                        <input type="hidden" name="rating" :value="selected">
-                        @error('rating')<p class="text-sm text-error mt-1">{{ $message }}</p>@enderror
-                    </div>
+                <x-alert type="error" :message="session('error')" />
+                <x-alert type="success" :message="session('success')" />
 
-                    {{-- Comentario --}}
-                    <div>
-                        <label for="comment" class="block text-sm font-medium text-white">Comentario</label>
-                        <textarea name="comment"
-                                  id="comment"
-                                  rows="4"
-                                  class="mt-1 w-full rounded-md bg-white border-gray-300 shadow-sm focus:ring-primary focus:border-primary text-form"
-                                  placeholder="Escribe tu experiencia...">{{ old('comment') }}</textarea>
-                        @error('comment')<p class="text-sm text-error mt-1">{{ $message }}</p>@enderror
-                    </div>
-
-                    {{-- Fotos --}}
-                    <div>
-                        <label class="block text-sm font-medium text-white">Fotos</label>
-                        <input type="file"
-                               name="photos[]"
-                               multiple
-                               accept="image/*"
-                               class="mt-1 w-full text-sm text-secondary
-                                      file:mr-4 file:py-2 file:px-4
-                                      file:rounded-full file:border-0
-                                      file:text-sm file:font-semibold
-                                      file:bg-primary/20 file:text-primary
-                                      hover:file:bg-primary/30">
-                        @error('photos')<p class="text-sm text-error mt-1">{{ $message }}</p>@enderror
-                    </div>
-
-                    <button type="submit"
-                            class="w-full justify-center px-4 py-2 rounded-md font-semibold text-form bg-white hover:bg-primary/80 transition">
-                        Enviar reseña
-                    </button>
-                </form>
+                <x-review.form :restaurant="$restaurant" />
             </div>
         @else
             <div class="mt-6 mb-4 text-center">
                 <p class="text-sm text-primary">
-                    ¿Quieres dejar una reseña?
-                    <a href="{{ route('access') }}" class="underline hover:opacity-80">Inicia sesión</a>.
+                    ¿Visitaste este restaurante? Tu opinión ayuda a otros.
+                    <a href="{{ route('access') }}" class="underline hover:opacity-80">Inicia sesión</a> para dejar tu reseña.
                 </p>
             </div>
         @endauth
     </div>
 
-    {{-- Modal global --}}
+        {{-- Modal global --}}
     <div
         id="image-modal"
         class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center z-50">
@@ -384,59 +327,10 @@
     </div>
 
     {{-- Script del lightbox --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const modal       = document.getElementById('image-modal');
-            const modalImg    = document.getElementById('modal-img');
-            const btnClose    = document.getElementById('modal-close');
-            const btnPrev     = document.getElementById('modal-prev');
-            const btnNext     = document.getElementById('modal-next');
-            let currentPhotos = [];
-            let currentIndex  = 0;
+    @push('scripts')
+        <script src="{{ asset('js/lightbox.js') }}"></script>
+    @endpush
 
-            document.querySelectorAll('.review-photos').forEach(container => {
-                const photos = JSON.parse(container.dataset.photos);
-                container.querySelectorAll('img[data-index]').forEach(img => {
-                    img.addEventListener('click', () => {
-                        currentPhotos = photos;
-                        currentIndex  = parseInt(img.dataset.index, 10);
-                        modalImg.src  = currentPhotos[currentIndex];
-                        modal.classList.remove('hidden');
-                    });
-                });
-            });
-
-            btnClose.addEventListener('click', () => modal.classList.add('hidden'));
-            btnPrev.addEventListener('click', () => {
-                currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
-                modalImg.src = currentPhotos[currentIndex];
-            });
-            btnNext.addEventListener('click', () => {
-                currentIndex = (currentIndex + 1) % currentPhotos.length;
-                modalImg.src = currentPhotos[currentIndex];
-            });
-
-            modal.addEventListener('click', e => {
-                if (e.target === modal) modal.classList.add('hidden');
-            });
-            // --- Navegación por teclado ---
-            document.addEventListener('keydown', e => {
-                if (modal.classList.contains('hidden')) return;
-
-                switch (e.key) {
-                    case 'ArrowLeft':
-                        btnPrev.click();
-                        break;
-                    case 'ArrowRight':
-                        btnNext.click();
-                        break;
-                    case 'Escape':
-                        btnClose.click();
-                        break;
-                }
-            });
-        });
-    </script>
     <!-- Footer -->
     <footer class="bg-white border-t mt-8">
         <div class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-secondary">

@@ -40,7 +40,11 @@ class ReviewController extends Controller
             ->where('restaurant_id', $request->restaurant_id)
             ->exists()
         ) {
-            return back()->with('error', 'Ya dejaste una reseña para este restaurante.');
+            return redirect()
+                ->route('restaurants.show', $request->restaurant_id)
+                ->with('error', 'Ya dejaste una reseña para este restaurante.')
+                ->withFragment('review-form');
+
         }
 
         $review = Review::create($request->only([
@@ -51,7 +55,8 @@ class ReviewController extends Controller
 
         return redirect()
             ->route('restaurants.show', $review->restaurant_id)
-            ->with('success', '¡Reseña publicada con éxito!');
+            ->with('success', '¡Reseña publicada con éxito!')
+            ->withFragment('review-form');
     }
 
     /**

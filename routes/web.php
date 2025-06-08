@@ -20,9 +20,6 @@ Route::get('/access', fn () => view('auth.login-register'))->name('access');
 // Cookies y privacidad
 Route::view('/cookies-policy', 'cookies.policy')->name('cookies.policy');
 
-// Rutas de análisis de restaurantes con OpenAI
-Route::get('/restaurants/{restaurant}/analysis', [RestaurantController::class, 'analysis'])->name('restaurants.analysis');
-
 /*
 |--------------------------------------------------------------------------
 | Rutas protegidas por auth
@@ -43,11 +40,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Rutas de reseñas y fotos de reseñas
-    |--------------------------------------------------------------------------
-    */
+    // Ruta de análisis de restaurantes con OpenAI
+    Route::get('/restaurants/{restaurant}/analysis', [RestaurantController::class, 'analysis'])->name('restaurants.analysis');
 
     // Borrar foto individual
     Route::delete('/reviews/{review}/photos/{photo}', [ReviewPhotoController::class, 'destroy'])->name('photos.destroy');

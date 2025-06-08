@@ -86,24 +86,24 @@ class RestaurantController extends Controller
         // Prompt mejorado
         $prompt = 'Analiza estas reseñas separadas por ### y devuelve un objeto JSON con:
 
-1. "analisis_general": resumen no tan corto del restaurante.
-2. "platos_mas_mencionados": lista de platos, sin repetir frases entre platos.
+        1. "analisis_general": resumen no tan corto del restaurante.
+        2. "platos_mas_mencionados": lista maximo 4 platos destacados, sin repetir frases entre platos.
 
-Evita usar la misma frase en más de un plato, incluso si aparecen juntos.
+        Evita usar la misma frase en más de un plato, incluso si aparecen juntos.
 
-Ejemplo:
-{
-  "analisis_general": "...",
-  "platos_mas_mencionados": [
-    {
-      "plato": "...",
-      "menciones": ...,
-      "frases_destacadas": ["..."] // distintas por plato
-    }
-  ]
-}
-###
-'.implode("\n###\n", $texts);
+        Ejemplo:
+        {
+          "analisis_general": "...",
+          "platos_mas_mencionados": [
+            {
+              "plato": "...",
+              "menciones": ...,
+              "frases_destacadas": ["..."] // distintas por plato
+            }
+          ]
+        }
+        ###
+        '.implode("\n###\n", $texts);
 
         // Llamada a OpenAI
         $client = \OpenAI::client(env('OPENAI_API_KEY'));
