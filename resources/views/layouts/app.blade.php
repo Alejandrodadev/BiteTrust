@@ -33,51 +33,35 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>[x-cloak] { display: none !important; }</style>
 </head>
-<body class="font-sans antialiased">
-<div class="min-h-screen bg-gray-50">
-    @include('layouts.navigation')
+<body class="font-sans antialiased min-h-screen flex flex-col bg-gray-50">
 
-    @isset($header)
-        <header class="bg-white">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                {{ $header }}
-            </div>
-        </header>
-    @endisset
+{{-- Navegación --}}
+@include('layouts.navigation')
 
-    <main>
-        {{ $slot }}
-    </main>
-</div>
+{{-- Contenido principal --}}
+<main class="flex-1">
+    {{ $slot }}
+</main>
 
-<!-- Aviso de Cookies -->
+{{-- Aviso de Cookies (ya está bien como está) --}}
 <div x-data="{
-        // Solo se muestra si n existe la clave 'cookies_accepted'
-        open: localStorage.getItem('cookies_accepted') === null
-    }"
+            open: localStorage.getItem('cookies_accepted') === null
+        }"
      x-show="open"
      x-cloak
-     class="fixed bottom-4 right-4 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg p-4 space-y-2 z-50"
->
+     class="fixed bottom-4 right-4 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg p-4 space-y-2 z-50">
     <p class="text-sm text-gray-700">
         🍪 Usamos cookies propias y de terceros para mejorar tu experiencia.
         Si continúas navegando aceptas su uso.
     </p>
-
     <div class="flex justify-end space-x-2">
         <button
-            @click="
-                // Guardamos 'true' (podría valer 'false', pero ya no lo comprobamos)
-                localStorage.setItem('cookies_accepted','true');
-                open = false;
-            "
+            @click="localStorage.setItem('cookies_accepted','true'); open = false;"
             class="px-3 py-1 text-sm bg-primaryLight text-white rounded hover:bg-primary/90 transition">
             Aceptar
         </button>
         <button
-            @click="// Guardamos en localStorage para que no vuelva a aparecer
-                localStorage.setItem('cookies_accepted','false');
-                open = false;"
+            @click="localStorage.setItem('cookies_accepted','false'); open = false;"
             class="px-3 py-1 text-sm bg-secondary text-white rounded hover:bg-primary/90 transition">
             Rechazar
         </button>
@@ -87,5 +71,11 @@
         </a>
     </div>
 </div>
+{{-- Footer fijo abajo --}}
+<footer class="bg-white border-t">
+    <div class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-secondary">
+        © {{ date('Y') }} {{ config('app.name') }}. Todos los derechos reservados.
+    </div>
+</footer>
 </body>
 </html>

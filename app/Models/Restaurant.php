@@ -22,6 +22,7 @@ class Restaurant extends Model
         'longitude',
         'ratingGoogle',
         'types',
+        'price_level',
     ];
 
     /**

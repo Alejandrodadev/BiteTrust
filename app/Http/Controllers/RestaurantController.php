@@ -8,6 +8,7 @@ use App\Models\Restaurant;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Http\Requests\CompareRestaurantsRequest;
 
 class RestaurantController extends Controller
 {
@@ -159,5 +160,43 @@ class RestaurantController extends Controller
         ]);
 
         return response()->json($data);
+
     }
+
+    public function compare(CompareRestaurantsRequest $request)
+    {
+        $ids = $request->validated()['ids'] ?? [];
+
+        // Sólo si han enviado algún id, comprobamos el rango
+        if (count($ids) && (count($ids) < 2 || count($ids) > 3)) {
+            return back()->withErrors([
+                'ids' => 'Debes seleccionar entre 2 y 3 restaurantes para comparar.'
+            ]);
+        }
+
+        $restaurants = $ids
+            ? Restaurant::whereIn('id', $ids)->get()
+            : collect();
+
+        return view('restaurants.compare', [
+            'selected' => $restaurants,
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $q = $request->get('q','');
+        if (strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        $results = Restaurant::where('name', 'LIKE', "%{$q}%")
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id','name']);
+
+        return response()->json($results);
+    }
+
+
 }

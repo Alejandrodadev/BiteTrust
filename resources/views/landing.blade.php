@@ -64,21 +64,6 @@
                                 {{ $restaurant->name }}
                             </h4>
 
-                            @if($restaurant->types)
-                                @php
-                                    $foodTypes = ['restaurant','food','bakery','meal_takeaway','meal_delivery','bar','cafe'];
-                                @endphp
-                                <div class="flex flex-wrap gap-2 mt-1 mb-1">
-                                    @foreach($restaurant->types as $type)
-                                        @if(in_array($type, $foodTypes))
-                                            <span class="px-2 py-0.5 text-xs text-secondary bg-gray-100 rounded-full capitalize">
-                                                {{ str_replace('_',' ',$type) }}
-                                            </span>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            @endif
-
                             <div class="text-sm text-secondary space-y-1 leading-tight">
                                 <div class="flex items-center gap-2 text-xs text-secondary">
                                     <img src="{{ asset('img/logo2.png') }}" alt="BiteTrust Logo" class="w-4 h-4 align-middle">
@@ -92,6 +77,9 @@
                                         <img src="{{ asset('img/logo-google.png') }}" alt="Google Logo" class="w-3 h-3 align-middle">
                                         <span class="leading-tight">
                                             {{ number_format($restaurant->ratingGoogle,1) }}/5
+                                            @if(! is_null($restaurant->price_level))
+                                                @for($i=0; $i < $restaurant->price_level; $i++)€@endfor
+                                            @endif
                                         </span>
                                     </div>
                                 @endif
@@ -187,10 +175,5 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t mt-12">
-        <div class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-secondary">
-            © {{ date('Y') }} {{ config('app.name') }}. Todos los derechos reservados.
-        </div>
-    </footer>
+
 </x-app-layout>

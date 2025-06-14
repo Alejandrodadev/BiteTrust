@@ -47,6 +47,9 @@
                             <x-dropdown-link :href="route('profile.edit')">
                                 {{ __('Mi perfil') }}
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('restaurants.compare')">
+                                {{ __('Comparar') }}
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('reviews.user')">
                                 {{ __('Mis reseñas') }}
                             </x-dropdown-link>

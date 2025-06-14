@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/', [LandingController::class, 'index'])->name('landing');
-Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show'])->name('restaurants.show');
+Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show'])->name('restaurants.show')->where('restaurant', '[0-9]+');
 Route::get('/access', fn () => view('auth.login-register'))->name('access');
 
 // Cookies y privacidad
@@ -35,12 +35,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/places/test', [GooglePlacesController::class, 'testSearch']);
     Route::post('/restaurants/register', [GooglePlacesController::class, 'register'])->name('restaurants.register');
 
+    // Comparación de restaurantes
+    Route::get('/restaurants/compare', [RestaurantController::class, 'compare'])->name('restaurants.compare');
+    Route::get('/restaurants/search', [RestaurantController::class, 'search'])->name('restaurants.search');
+
+
     // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Ruta de análisis de restaurantes con OpenAI
+    // Análisis de restaurantes con OpenAI
     Route::get('/restaurants/{restaurant}/analysis', [RestaurantController::class, 'analysis'])->name('restaurants.analysis');
 
     // Borrar foto individual

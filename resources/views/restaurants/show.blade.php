@@ -264,7 +264,7 @@
             </span>
                 </div>
 
-                {{-- From Google --}}
+                {{-- Google --}}
                 <div class="flex items-center text-xs text-gray-500 mb-2">
                     <img src="{{ asset('img/logo-google.png') }}"
                          alt="Google Logo"
@@ -330,11 +330,4 @@
     @push('scripts')
         <script src="{{ asset('js/lightbox.js') }}"></script>
     @endpush
-
-    <!-- Footer -->
-    <footer class="bg-white border-t mt-8">
-        <div class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-secondary">
-            © {{ date('Y') }} {{ config('app.name') }}. Todos los derechos reservados.
-        </div>
-    </footer>
 </x-app-layout>

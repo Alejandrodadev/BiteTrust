@@ -28,7 +28,7 @@ class GooglePlacesController extends Controller
             'place_id' => $placeId,
             'key' => $apiKey,
             'language' => 'es',
-            'fields' => 'name,formatted_address,geometry,rating,place_id,user_ratings_total,website,opening_hours,address_components,types,reviews',
+            'fields' => 'name,formatted_address,geometry,rating,place_id,user_ratings_total,website,opening_hours,address_components,types,reviews,price_level',
         ]);
 
         $detail = $response->json()['result'] ?? null;
@@ -71,6 +71,7 @@ class GooglePlacesController extends Controller
             'schedule' => $detail['opening_hours']['weekday_text'] ?? [],
             'website' => $detail['website'] ?? null,
             'types' => $types,
+            'price_level' => $detail['price_level'] ?? null,
         ]);
 
         // Guardar reseñas de Google (hasta 5)
@@ -91,6 +92,6 @@ class GooglePlacesController extends Controller
 
         return redirect()
             ->route('landing')
-            ->with('success', 'Nuevo restaurante registrado, deja tu reseña.');
+            ->with('success', 'Restaurante registrado, deja tu reseña.');
     }
 }
