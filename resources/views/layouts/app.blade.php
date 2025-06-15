@@ -27,6 +27,9 @@
     <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_PLACES_KEY') }}&libraries=places"></script>
 
     <!-- Styles & Scripts -->
+    <script>
+        window.isGuest = @json(auth()->guest());
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Alpine.js -->
@@ -43,30 +46,30 @@
     {{ $slot }}
 </main>
 
-{{-- Aviso de Cookies (ya está bien como está) --}}
+{{-- Aviso de Cookies --}}
 <div x-data="{
             open: localStorage.getItem('cookies_accepted') === null
         }"
      x-show="open"
      x-cloak
-     class="fixed bottom-4 right-4 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg p-4 space-y-2 z-50">
-    <p class="text-sm text-gray-700">
+     class="fixed bottom-8 right-8 max-w-xl bg-white border border-gray-200 rounded-xl shadow-2xl p-6 space-y-3 z-50">
+    <p class="text-base text-gray-700">
         🍪 Usamos cookies propias y de terceros para mejorar tu experiencia.
         Si continúas navegando aceptas su uso.
     </p>
-    <div class="flex justify-end space-x-2">
+    <div class="flex justify-end flex-wrap gap-2">
         <button
             @click="localStorage.setItem('cookies_accepted','true'); open = false;"
-            class="px-3 py-1 text-sm bg-primaryLight text-white rounded hover:bg-primary/90 transition">
+            class="px-4 py-2 text-sm bg-primaryLight text-white rounded hover:bg-primary/90 transition">
             Aceptar
         </button>
         <button
             @click="localStorage.setItem('cookies_accepted','false'); open = false;"
-            class="px-3 py-1 text-sm bg-secondary text-white rounded hover:bg-primary/90 transition">
+            class="px-4 py-2 text-sm bg-secondary text-white rounded hover:bg-primary/90 transition">
             Rechazar
         </button>
         <a href="{{ route('cookies.policy') }}"
-           class="px-3 py-1 text-sm text-gray-600 hover:underline">
+           class="px-4 py-2 text-sm text-gray-600 hover:underline">
             Más info
         </a>
     </div>

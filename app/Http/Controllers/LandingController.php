@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 
 class LandingController extends Controller
 {
@@ -12,17 +14,17 @@ class LandingController extends Controller
         // Filtro de ciudades
         $cities = Restaurant::select('city')->distinct()->pluck('city');
 
-        // Coordenadas de filtrado (si vienen en la URL)
+        // Parámetros de coordenadas
         $lat = $request->query('lat');
         $lng = $request->query('lng');
 
-        // Query base
+        // Query base de restaurantes
         $query = Restaurant::withAvg('reviews', 'rating')
             ->withCount('reviews');
 
         // Filtro por nombre
         if ($request->filled('search')) {
-            $query->where('name', 'LIKE', '%'.$request->search.'%');
+            $query->where('name', 'LIKE', '%' . $request->search . '%');
         }
 
         // Filtro por ciudad
@@ -30,27 +32,25 @@ class LandingController extends Controller
             $query->where('city', $request->city);
         }
 
-        // Si tenemos lat/lng, añadimos cálculo de distancia y ordenamos por cercanis
+        // Distancia Haversine si tenemos lat/lng
         if ($lat && $lng) {
             $lat = (float) $lat;
             $lng = (float) $lng;
 
             $haversine = "(6371 * acos(
-            cos(radians($lat)) *
-            cos(radians(latitude)) *
-            cos(radians(longitude) - radians($lng)) +
-            sin(radians($lat)) *
-            sin(radians(latitude))
-        ))";
+                cos(radians($lat)) *
+                cos(radians(latitude)) *
+                cos(radians(longitude) - radians($lng)) +
+                sin(radians($lat)) *
+                sin(radians(latitude))
+            ))";
 
-            // Campo distance al SELECT y ordenamos
-            $query->addSelect(\DB::raw("$haversine AS distance"))
+            $query->addSelect(DB::raw("$haversine AS distance"))
                 ->orderBy('distance', 'asc');
         }
 
-        // Orden según el parámetro 'sort'
+        // Orden según 'sort'
         $sort = $request->get('sort', 'popularidad');
-
         if ($sort === 'recientes') {
             $query->orderByDesc('created_at');
         } elseif ($sort === 'tendencias') {
@@ -62,16 +62,21 @@ class LandingController extends Controller
                 ->orderByDesc('recent_reviews_count')
                 ->orderByDesc('reviews_count');
         } else {
-            // popularidad se muestra por defecto
+            // popularidad por defecto
             $query->orderByDesc('reviews_count')
                 ->orderByDesc('reviews_avg_rating');
         }
 
-        // Paginacion manteniendo los parámetros en la URL
+        // Paginación
         $restaurants = $query->paginate(12)->withQueryString();
 
-        // lat/lng a la vista para mostrar distancia
-        return view('landing', compact('restaurants', 'cities', 'sort', 'lat', 'lng'));
+        // Devolver as la vista
+        return view('landing', [
+            'restaurants' => $restaurants,
+            'cities'      => $cities,
+            'sort'        => $sort,
+            'lat'         => $lat,
+            'lng'         => $lng,
+        ]);
     }
-
 }

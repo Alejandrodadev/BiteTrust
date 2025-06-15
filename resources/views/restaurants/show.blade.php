@@ -43,7 +43,23 @@
 
                         {{-- Dirección + Web --}}
                         <div class="flex items-center gap-2 mt-1">
-                            <span class="text-xs text-secondary">{{ $restaurant->address }}📍</span>
+                            @php
+                                if(isset($restaurant->lat, $restaurant->lng)) {
+                                    // Usamos coordenadas si existen
+                                    $mapsUrl = "https://www.google.com/maps?q={$restaurant->lat},{$restaurant->lng}";
+                                } else {
+                                    // Si no, usamos la búsqueda por dirección
+                                    $mapsUrl = 'https://www.google.com/maps/search/' . urlencode($restaurant->address);
+                                }
+                            @endphp
+
+                            {{-- Enlace clicable --}}
+                            <a href="{{ $mapsUrl }}" target="_blank" rel="noopener noreferrer"
+                               class="text-xs text-secondary hover:underline flex items-center gap-1" title="Ir a Maps">
+                                <span>{{ $restaurant->address }}</span>
+                                <span>📍</span>
+                            </a>
+
                             @if($restaurant->website)
                                 <a href="{{ $restaurant->website }}" target="_blank" rel="noopener noreferrer"
                                    class="hover:opacity-90 transition" title="Visitar sitio web">

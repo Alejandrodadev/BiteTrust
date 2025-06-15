@@ -108,6 +108,9 @@
                 <x-responsive-nav-link :href="route('profile.edit')" class="!rounded-md">
                     {{ __('Mi perfil') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('restaurants.compare')">
+                    {{ __('Comparar') }}
+                    </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('reviews.user')" class="!rounded-md">
                     {{ __('Mis reseñas') }}
                 </x-responsive-nav-link>

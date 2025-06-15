@@ -1,5 +1,5 @@
 
-// Esperamos a que cargue Alpine y el DOM
+// Carga primero Alpine y el DOM
 document.addEventListener('alpine:init', () => {
     Alpine.data('landingFilters', () => ({
         openFilters: false,
